@@ -81,7 +81,7 @@ class ReflexAgent(Agent):
 
         # Calculate distance to nearest food pellet
         if len(allFoodDistance) != 0:
-            nearest_food_distance = min(allFoodDistance)
+            nearestFood = min(allFoodDistance)
         else:
             return 10000
 
@@ -93,12 +93,12 @@ class ReflexAgent(Agent):
 
         # Score based on scared ghosts
         scaredGhosts = [ghost for ghost, scared_time in zip(newGhostStates, newScaredTimes) if scared_time > 0]
-        scared_ghost_distance = 0
+        scaredDistance = 0
         if scaredGhosts:
-            scared_ghost_distance = min([manhattanDistance(newPos, ghost.configuration.pos) for ghost in scaredGhosts])
+            scaredDistance = min([manhattanDistance(newPos, ghost.configuration.pos) for ghost in scaredGhosts])
         
         # Combine scores with appropriate weights
-        combined_score = childGameState.getScore() + nearestGhost / (nearest_food_distance * 10) + scared_ghost_distance
+        combined_score = childGameState.getScore() + nearestGhost / (nearestFood * 10) + scaredDistance
 
         if action == 'Stop':
             combined_score -= 20
