@@ -66,6 +66,7 @@ class ReflexAgent(Agent):
         Print out these variables to see what you're getting, then combine them
         to create a masterful evaluation function.
         """
+
         # Useful information you can extract from a GameState (pacman.py)
         childGameState = currentGameState.getPacmanNextState(action)
         newPos = childGameState.getPacmanPosition()
@@ -162,7 +163,72 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        result = self.MinMax(gameState, 0, 0)
+        return result[1]
+
+    def MinMax(self, gameState, depth, agent=None):
+        # Get legal actions for the current agent
+        legalActions = gameState.getLegalActions(0)
+
+        # Check terminal conditions
+        if len(legalActions) == 0 or gameState.isWin() or gameState.isLose() or depth == self.depth: 
+            # Return the evaluation value and no action
+            return self.evaluationFunction(gameState), None
+        
+        if agent == 0:
+            # If it's Pacman's turn, call the max function
+            return self.max(gameState=gameState, depth=depth)
+        
+        else:
+            # If it's a ghost's turn, call the min function
+            return self.min(gameState=gameState, depth=depth, agent=agent)
+
+    # Max Function (Pacman)
+    def max(self, gameState, depth):
+        maxValue = float("-inf")
+        optimalAction = None
+        legalActions = gameState.getLegalActions(0)
+        
+        # Iterate over legal actions
+        for action in legalActions:
+            # Get the next state after taking the action
+            nextState = gameState.getNextState(0, action)
+
+            # Call MinMax recursively for the next state with depth increased
+            value = self.MinMax(gameState=nextState, depth=depth, agent=1)[0]
+
+            # Update maxValue and optimalAction if a better action is found
+            if value > maxValue:
+                maxValue, optimalAction = value, action
+
+        return maxValue, optimalAction
+    
+    # Min Function (Ghosts)
+    def min(self, gameState, depth, agent):
+        minValue = float("inf")
+        optimalAction = None
+        legalActions = gameState.getLegalActions(agent)
+
+        # Iterate over legal actions
+        for action in legalActions:
+            # Get the next state after taking the action
+            if agent == gameState.getNumAgents() - 1:
+
+                # If it's the last ghost, call MinMax with depth increased and agent set to 0
+                nextState = gameState.getNextState(agent, action)
+                value = self.MinMax(nextState, depth + 1, 0)[0]
+
+            else:
+                # If it's not the last ghost, call MinMax with depth unchanged and agent increased
+                nextState = gameState.getNextState(agent, action)
+                value = self.MinMax(nextState, depth, agent + 1)[0]
+            
+            # Update minValue and optimalAction if a better action is found
+            if value < minValue:
+                minValue, optimalAction = value, action
+
+        return minValue, optimalAction
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
