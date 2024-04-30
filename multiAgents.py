@@ -75,7 +75,6 @@ class ReflexAgent(Agent):
 
         "*** YOUR CODE HERE ***"
 
-        actionScore = childGameState.getScore()
         allFoodDistance = [manhattanDistance(newPos, food) for food in newFood.asList()]
         allGhostDistance = [manhattanDistance(newPos, ghost.configuration.pos) for ghost in newGhostStates]
 
@@ -89,21 +88,20 @@ class ReflexAgent(Agent):
         if len(allGhostDistance) != 0:
             nearestGhost = min(allGhostDistance)
         else:
-            nearestGhost = float('inf')
+            nearestGhost = float("inf")
 
         # Score based on scared ghosts
-        scaredGhosts = [ghost for ghost, scared_time in zip(newGhostStates, newScaredTimes) if scared_time > 0]
-        scaredDistance = 0
-        if scaredGhosts:
-            scaredDistance = min([manhattanDistance(newPos, ghost.configuration.pos) for ghost in scaredGhosts])
+        for ghost in newGhostStates:
+            if ghost.configuration.pos == nearestGhost and ghost.scaredTimer > 0:
+                nearestGhost = 99999
         
         # Combine scores with appropriate weights
-        combined_score = childGameState.getScore() + nearestGhost / (nearestFood * 10) + scaredDistance
+        combinedScore = childGameState.getScore() + nearestGhost / (nearestFood * 10)
 
         if action == 'Stop':
-            combined_score -= 20
+            combinedScore -= 20
 
-        return combined_score
+        return combinedScore
 
 def scoreEvaluationFunction(currentGameState):
     """
