@@ -277,11 +277,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             # Update maxValue and optimalAction if a better action is found
             if value > maxValue:
                 maxValue, optimalAction = value, action
-            
-            alpha = max(alpha, maxValue)
 
-            if beta <= alpha:
-                break
+            if (maxValue > beta):
+                return maxValue, optimalAction
+            
+            # Update alpha value
+            alpha = max(alpha, maxValue)
 
         return maxValue, optimalAction
     
@@ -308,11 +309,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             # Update minValue and optimalAction if a better action is found
             if value < minValue:
                 minValue, optimalAction = value, action
-            
-            beta = min(beta, minValue)
 
-            if beta <= alpha:
-                break
+            if (minValue < alpha):
+                return minValue, optimalAction
+            
+            # Update beta value
+            beta = min(beta, minValue)
 
         return minValue, optimalAction
 
